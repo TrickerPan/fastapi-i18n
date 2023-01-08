@@ -1,1 +1,1 @@
-from translation import init, Translator
+from .translation import init, Translator
