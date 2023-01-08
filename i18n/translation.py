@@ -42,6 +42,7 @@ def init():
 class Translator:
     locales: dict[str, float]
     _sorted_locales: list[str] = None
+    _sorted_short_locales: list[str] = None
 
     def __init__(self, accept_language: str = Header(default=None)):
         if accept_language is None:
@@ -71,12 +72,18 @@ class Translator:
         package = _settings.i18n_default_package
         if ':' in code:
             package, code = code.split(':')
+
         package: dict = _messages.get(package)
         if package is None:
             return code
+
         messages: dict | str | None = None
         for locale in self.get_sorted():
             messages = package.get(locale)
+            if messages is not None:
+                break
+        for short in self.get_sorted_short():
+            messages = package.get(short)
             if messages is not None:
                 break
         if messages is None:
@@ -96,3 +103,17 @@ class Translator:
             self._sorted_locales = [x[0] for x in sorted(self.locales.items(), key=lambda x: x[1], reverse=True)]
 
         return self._sorted_locales
+
+    def get_sorted_short(self):
+        if self._sorted_short_locales is None:
+            self._sorted_short_locales = list(self._dedupe())
+
+        return self._sorted_short_locales
+
+    def _dedupe(self):
+        seen = set()
+        for item in self.get_sorted():
+            short = item[0:2]
+            if short not in seen:
+                yield short
+                seen.add(item)
