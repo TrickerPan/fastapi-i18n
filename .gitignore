@@ -1,4 +1,9 @@
-.idea/
 dist/
-*.pyc
+venv/
+.env
+
+.idea/
+.DS_Store
 *.http
+*.iml
+*.pyc
