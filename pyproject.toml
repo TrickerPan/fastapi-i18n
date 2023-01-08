@@ -6,6 +6,8 @@ keywords = ["fastapi", "i18n"]
 license = "MIT"
 authors = ["tricker.pan <tricker.pan@gmail.com>"]
 maintainers = ["tricker.pan <tricker.pan@gmail.com>"]
+homepage = "https://github.com/TrickerPan/fastapi-i18n"
+repository = "https://github.com/TrickerPan/fastapi-i18n"
 readme = "README.md"
 packages = [{include = "i18n"}]
 
