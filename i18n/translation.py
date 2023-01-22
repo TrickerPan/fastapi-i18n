@@ -1,4 +1,5 @@
 import os
+from decimal import Decimal
 from typing import Callable
 
 import yaml
@@ -13,6 +14,7 @@ except ImportError:
 
 _settings = get_settings()
 _allowed_ext = ('yaml', 'yml')
+_default_priority = Decimal(1)
 
 _messages = {}
 
@@ -50,25 +52,27 @@ def _dedupe(items: list[str]):
 
 
 def translator(accept_language: str = Header(default=None)) -> Callable[[str], str]:
-    locales: dict[str, float] = {}
+    locales: dict[str, Decimal] = {}
+
     if accept_language is None:
-        locales[_settings.i18n_default_locale] = 1
+        locales[_settings.i18n_default_locale] = _default_priority
     elif ',' not in accept_language:
         if ';' not in accept_language:
-            locales[accept_language] = 1
+            locales[accept_language] = _default_priority
         else:
             locale, q = accept_language.split(';')
             _, q = q.split('=')
-            locales[locale] = int(q)
+            locales[locale] = Decimal(q)
     else:
         _locales = accept_language.split(',')
         for locale in _locales:
             if ';' not in locale:
-                locales[locale] = 1
+                locales[locale] = _default_priority
                 continue
             locale, q = locale.split(';')
             _, q = q.split('=')
-            locales[locale] = int(q)
+            locales[locale] = Decimal(q)
+
     sorted_locales = [x[0] for x in sorted(locales.items(), key=lambda x: x[1], reverse=True)]
     sorted_locales += list(_dedupe(sorted_locales))
 
